@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
+    "postinstall": "tsc",
     "start:dev": "tsx src/server.ts"
   },
   "keywords": [],
@@ -31,5 +32,9 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.9.9",
     "sequelize": "^6.37.3"
+  },
+  "engines": { 
+    "node": "20.5.1",
+    "npm": "9.8.1" 
   }
 }
