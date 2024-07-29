@@ -1,64 +1,69 @@
-import dotenv from 'dotenv'
-import { Sequelize, DataTypes, Model } from "sequelize"
+import { Sequelize, DataTypes, Model } from "sequelize";
+import dotenv from 'dotenv';
 
-dotenv.config()
-const { HOST, USER, PASSWORD, DATABASE, PORT_DATABASE_CONNECTION, SSL } = process.env
+dotenv.config();
 
 const sequelize = new Sequelize({
-    database: DATABASE,
-    username: USER,
-    password: PASSWORD,
-    host: HOST,
-    port: +PORT_DATABASE_CONNECTION!,
-    ssl: SSL === 'REQUIRED' ? true : false,
-    dialect: 'mysql'
-})
+    database: process.env.DATABASE,
+    username: process.env.USER,
+    password: process.env.PASSWORD,
+    host: process.env.HOST,
+    port: Number(process.env.PORT_DATABASE_CONNECTION),
+    dialect: 'mysql',
+    dialectOptions: {
+        ssl: process.env.SSL === 'REQUIRED' ? { rejectUnauthorized: false } : false
+    }
+});
 
 export default class UE extends Model {}
 
 UE.init(
     {
-        email_comercial:{
+        email_comercial: {
             type: DataTypes.STRING,
             allowNull: false,
             primaryKey: true
         },
-        senha:{
+        senha: {
             type: DataTypes.STRING,
             allowNull: false
         },
-        razao_social:{
+        razao_social: {
             type: DataTypes.STRING,
             allowNull: false,
             unique: true
         },
-        cnpj:{
+        cnpj: {
             type: DataTypes.CHAR(18),
             allowNull: false,
             unique: true
         },
-        cep:{
+        cep: {
             type: DataTypes.CHAR(9),
             allowNull: true,
         },
-        logradouro:{
+        logradouro: {
             type: DataTypes.STRING(150),
             allowNull: true
         },
-        bairro:{
+        bairro: {
             type: DataTypes.STRING(100),
             allowNull: true
         },
-        municipio:{
+        municipio: {
             type: DataTypes.STRING(100),
             allowNull: true
         },
-        suplemento:{
+        suplemento: {
             type: DataTypes.STRING(200),
             allowNull: true
         },
         numero_contato: {
             type: DataTypes.STRING(20),
+            allowNull: true
+        },
+        api_key: {
+            type: DataTypes.STRING,
             allowNull: true
         }
     },
@@ -68,4 +73,4 @@ UE.init(
         tableName: 'usuarios_empresariais',
         timestamps: false
     }
-)
+);
