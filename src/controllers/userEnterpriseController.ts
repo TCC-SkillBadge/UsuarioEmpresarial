@@ -22,7 +22,6 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
     console.log('Recebida requisição para cadastrar usuário:', req.body);
     const { email_comercial, senha, razao_social, cnpj, cep, logradouro, bairro, municipio, suplemento, numero_contato } = req.body;
 
-    // Adicione logs para verificar os valores
     console.log('SALT_ROUNDS:', SALT_ROUNDS);
     console.log('Senha recebida:', senha);
 
@@ -102,6 +101,22 @@ export const acessarInfoUsuario = async (req: Request, res: Response) => {
     }
 };
 
+export const acessarInfoByApiKey = async (req: Request, res: Response) => {
+    try {
+        const user = (req as any).user;
+        console.log('Usuário encontrado pelo API Key:', user);  // Log do usuário encontrado
+
+        if (user) {
+            res.status(200).json(user);
+        } else {
+            res.status(404).send('Usuário não encontrado');
+        }
+    } catch (err) {
+        console.error("Erro na operação 'acessarInfoByApiKey' no serviço de Usuários Empresariais", err);
+        res.status(503).send('Serviço Indisponível');
+    }
+};
+
 export const verTodosUsuarios = async (req: Request, res: Response) => {
     try {
         const todosUE = await UE.findAll();
@@ -118,6 +133,7 @@ export const verTodosUsuarios = async (req: Request, res: Response) => {
 
 export const consultarUsuario = async (req: Request, res: Response) => {
     const { pesquisa } = req.query;
+    console.log(`Consulta recebida com pesquisa: ${pesquisa}`);
     try {
         const espUE = await UE.findOne({
             where: {
@@ -128,12 +144,36 @@ export const consultarUsuario = async (req: Request, res: Response) => {
             }
         });
         if (espUE) {
+            console.log('Usuário encontrado:', espUE);
             res.status(200).json(espUE);
         } else {
+            console.log('Usuário não encontrado');
             res.status(404).send(new UsuarioEmpresarialNaoEncontrado());
         }
     } catch (err) {
         console.error("Erro na operação 'Consultar' no serviço de Usuários Empresariais", err);
+        res.status(503).send(new ServicoIndisponivel(''));
+    }
+};
+
+export const acessarInfoUsuarioByApiKey = async (req: Request, res: Response) => {
+    const { api_key } = req.query;
+    console.log(`Consulta recebida com api_key: ${api_key}`);
+    try {
+        const espUE = await UE.findOne({
+            where: {
+                api_key: api_key
+            }
+        });
+        if (espUE) {
+            console.log('Usuário encontrado:', JSON.stringify(espUE, null, 2));
+            res.status(200).json(espUE);
+        } else {
+            console.log('Usuário não encontrado');
+            res.status(404).send(new UsuarioEmpresarialNaoEncontrado());
+        }
+    } catch (err) {
+        console.error("Erro na operação 'acessarInfoUsuarioByApiKey' no serviço de Usuários Empresariais", err);
         res.status(503).send(new ServicoIndisponivel(''));
     }
 };

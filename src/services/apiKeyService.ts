@@ -13,7 +13,7 @@ export const generateApiKey = async (email_comercial: string) => {
 export const sendApiKeyEmail = async (email: string, apiKey: string) => {
     const transporter = nodemailer.createTransport({
         host: MAIL_HOST,
-        port: Number(MAIL_PORT),// true for 465, false for other ports
+        port: Number(MAIL_PORT), // true for 465, false for other ports
         secure: false, 
         auth: {
             user: MAIL_USER,

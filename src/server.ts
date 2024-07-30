@@ -25,7 +25,7 @@ app.use('/api', userEnterpriseRoutes);
 // Sincronização com o banco de dados e inicialização do servidor
 sequelize.sync().then(() => {
     app.listen(PORT, () => {
-        console.log(`Usuário Empresarial. Executando Porta ${PORT}`);
+        console.log(`Usuário Empresarial. Executando na Porta ${PORT}`);
     });
 }).catch((error) => {
     console.error('Erro ao conectar ao banco de dados:', error);
