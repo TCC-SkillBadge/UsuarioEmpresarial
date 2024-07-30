@@ -39,7 +39,7 @@ UE.init(
             unique: true
         },
         cep: {
-            type: DataTypes.CHAR(9),
+            type: DataTypes.STRING(10), // Ajuste o tamanho conforme necessário
             allowNull: true,
         },
         logradouro: {

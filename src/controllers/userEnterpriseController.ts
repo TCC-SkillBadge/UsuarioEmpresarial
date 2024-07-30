@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { Op } from 'sequelize';
-import axios from 'axios'; 
+import axios from 'axios';
 import UE from '../models/UserEnterprise.js';
 import { generateApiKey, sendApiKeyEmail } from '../services/apiKeyService.js';
 import { 
@@ -12,21 +12,30 @@ import {
     NenhumUsuarioEmpresarialEncontrado,
     ViolacaoUnique
 } from '../utils/errorList.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const { JWT_UE_ACCESS_KEY, JWT_EXPIRATION_TIME, SALT_ROUNDS } = process.env;
 
 export const cadastrarUsuario = async (req: Request, res: Response) => {
     console.log('Recebida requisição para cadastrar usuário:', req.body);
     const { email_comercial, senha, razao_social, cnpj, cep, logradouro, bairro, municipio, suplemento, numero_contato } = req.body;
+
+    // Adicione logs para verificar os valores
+    console.log('SALT_ROUNDS:', SALT_ROUNDS);
+    console.log('Senha recebida:', senha);
+
     let senhaHash, sucesso = false;
     while (!sucesso) {
         try {
-            senhaHash = await bcrypt.hash(senha, +SALT_ROUNDS!);
+            senhaHash = await bcrypt.hash(senha, Number(SALT_ROUNDS));
             sucesso = true;
         } catch (err) {
             console.error("Erro no bcrypt.hash()", err);
         }
     }
+
     try {
         const novoUE = await UE.create({ email_comercial, senha: senhaHash, razao_social, cnpj, cep, logradouro, bairro, municipio, suplemento, numero_contato });
         if (novoUE) {
