@@ -55,33 +55,36 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
 };
 
 export const loginUsuario = async (req: Request, res: Response) => {
-    const { email_comercial, senha } = req.query;
-    try {
-        const usuarioE = await UE.findByPk(email_comercial as string);
-        if (usuarioE) {
-            const senhaDadaEstaCorreta = await bcrypt.compare(senha as string, usuarioE.getDataValue('senha'));
-            if (senhaDadaEstaCorreta) {
-                const token = jwt.sign(
-                    { usuario: usuarioE.getDataValue('email_comercial') },
-                    JWT_UE_ACCESS_KEY!,
-                    { expiresIn: JWT_EXPIRATION_TIME! }
-                );
-                const resposta = {
-                    token,
-                    tipoUsuario: 'UE'
-                };
-                res.status(200).json(resposta);
-            } else {
-                res.status(401).send(new SenhaIncorreta());
-            }
-        } else {
-            res.status(404).send(new UsuarioEmpresarialNaoEncontrado());
-        }
-    } catch (err) {
-        console.error("Erro na operação 'Login' no serviço de Usuários Empresariais", err);
-        res.status(503).send(new ServicoIndisponivel(''));
+  const { email_comercial, senha } = req.body; // Usando req.body para POST
+  try {
+    const usuarioE = await UE.findByPk(email_comercial as string);
+    if (usuarioE) {
+      const senhaDadaEstaCorreta = await bcrypt.compare(senha as string, usuarioE.getDataValue('senha'));
+      if (senhaDadaEstaCorreta) {
+        const token = jwt.sign(
+          { usuario: usuarioE.getDataValue('email_comercial') },
+          JWT_UE_ACCESS_KEY!,
+          { expiresIn: JWT_EXPIRATION_TIME! }
+        );
+        const resposta = {
+          token,
+          tipoUsuario: 'UE'
+        };
+        res.status(200).json(resposta);
+      } else {
+        res.status(401).send(new SenhaIncorreta());
+      }
+    } else {
+      res.status(404).send(new UsuarioEmpresarialNaoEncontrado());
     }
+  } catch (err) {
+    console.error("Erro na operação 'Login' no serviço de Usuários Empresariais", err);
+    res.status(503).send(new ServicoIndisponivel(''));
+  }
 };
+
+
+
 
 export const acessarInfoUsuario = async (req: Request, res: Response) => {
     console.log('Requisição recebida para acessarInfoUsuario:', req.query);
@@ -212,5 +215,15 @@ export const generateApiKeyController = async (req: Request, res: Response) => {
         } else {
             res.status(500).send('Erro desconhecido');
         }
+    }
+};
+
+export const acessarInfoUsuarioJwt = async (req: Request, res: Response) => {
+    try {
+        const user = (req as any).user;
+        res.status(200).json(user);
+    } catch (err) {
+        console.error("Erro na operação 'acessarInfoUsuarioJwt' no serviço de Usuários Empresariais", err);
+        res.status(503).send('Serviço Indisponível');
     }
 };
