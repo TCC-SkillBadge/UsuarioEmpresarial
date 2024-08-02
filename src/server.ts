@@ -7,7 +7,7 @@ import sequelize from './config/database.js';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 6003;
+const PORT = process.env.PORT || 7003; // Certifique-se de que a porta está correta
 
 // Middleware para habilitar CORS e JSON
 app.use(cors());
@@ -20,7 +20,7 @@ app.use((req, res, next) => {
 });
 
 // Definição das rotas
-app.use('/api', userEnterpriseRoutes);
+app.use('/api', userEnterpriseRoutes); // Certifique-se de que as rotas estão sendo usadas aqui
 
 // Sincronização com o banco de dados e inicialização do servidor
 sequelize.sync().then(() => {

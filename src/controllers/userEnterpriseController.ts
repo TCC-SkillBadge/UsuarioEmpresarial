@@ -55,11 +55,13 @@ export const cadastrarUsuario = async (req: Request, res: Response) => {
 };
 
 export const loginUsuario = async (req: Request, res: Response) => {
-  const { email_comercial, senha } = req.body; // Usando req.body para POST
+  console.log('Requisição de login recebida:', req.body); // Log para depuração
+  const { email_comercial, senha } = req.body;
+
   try {
     const usuarioE = await UE.findByPk(email_comercial as string);
     if (usuarioE) {
-      const senhaDadaEstaCorreta = await bcrypt.compare(senha as string, usuarioE.getDataValue('senha'));
+      const senhaDadaEstaCorreta = await bcrypt.compare(senha, usuarioE.getDataValue('senha'));
       if (senhaDadaEstaCorreta) {
         const token = jwt.sign(
           { usuario: usuarioE.getDataValue('email_comercial') },
@@ -72,16 +74,19 @@ export const loginUsuario = async (req: Request, res: Response) => {
         };
         res.status(200).json(resposta);
       } else {
-        res.status(401).send(new SenhaIncorreta());
+        console.log('Senha incorreta'); // Log para depuração
+        res.status(401).send('Senha incorreta');
       }
     } else {
-      res.status(404).send(new UsuarioEmpresarialNaoEncontrado());
+      console.log('Usuário não encontrado'); // Log para depuração
+      res.status(404).send('Usuário não encontrado');
     }
   } catch (err) {
     console.error("Erro na operação 'Login' no serviço de Usuários Empresariais", err);
-    res.status(503).send(new ServicoIndisponivel(''));
+    res.status(503).send('Serviço indisponível');
   }
 };
+
 
 
 

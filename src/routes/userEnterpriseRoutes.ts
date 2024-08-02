@@ -17,7 +17,7 @@ import { jwtAuthMiddleware } from '../middleware/jwtAuthMiddleware.js';
 const router = Router();
 
 router.post('/cadastrar', (req, res, next) => { console.log('Rota /cadastrar chamada'); next(); }, cadastrarUsuario);
-router.post('/login', (req, res, next) => { console.log('Rota /login chamada'); next(); }, loginUsuario);
+router.post('/login', (req, res, next) => { console.log('Rota /login chamada'); next(); }, loginUsuario); // Certifique-se que esta rota está aqui
 router.get('/acessa-info', (req, res, next) => { console.log('Rota /acessa-info chamada'); next(); }, acessarInfoUsuario);
 router.get('/ver-todos', (req, res, next) => { console.log('Rota /ver-todos chamada'); next(); }, verTodosUsuarios);
 router.get('/consultar', (req, res, next) => { console.log('Rota /consultar chamada'); next(); }, consultarUsuario);
