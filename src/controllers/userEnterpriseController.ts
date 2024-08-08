@@ -5,6 +5,7 @@ import { Op } from 'sequelize';
 import axios from 'axios';
 import UE from '../models/UserEnterprise.js';
 import { generateApiKey, sendApiKeyEmail } from '../services/apiKeyService.js';
+import { sendPasswordResetEmail } from '../services/emailService.js';
 import { 
     SenhaIncorreta,
     ServicoIndisponivel,
@@ -16,7 +17,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const { JWT_UE_ACCESS_KEY, JWT_EXPIRATION_TIME, SALT_ROUNDS } = process.env;
+const { JWT_UE_ACCESS_KEY, JWT_EXPIRATION_TIME, SALT_ROUNDS, FRONTEND_PORT } = process.env;
 
 export const cadastrarUsuario = async (req: Request, res: Response) => {
     console.log('Recebida requisição para cadastrar usuário:', req.body);
@@ -86,10 +87,6 @@ export const loginUsuario = async (req: Request, res: Response) => {
     res.status(503).send('Serviço indisponível');
   }
 };
-
-
-
-
 
 export const acessarInfoUsuario = async (req: Request, res: Response) => {
     console.log('Requisição recebida para acessarInfoUsuario:', req.query);
@@ -230,5 +227,55 @@ export const acessarInfoUsuarioJwt = async (req: Request, res: Response) => {
     } catch (err) {
         console.error("Erro na operação 'acessarInfoUsuarioJwt' no serviço de Usuários Empresariais", err);
         res.status(503).send('Serviço Indisponível');
+    }
+};
+
+// Novas funções para redefinição de senha
+export const requestPasswordResetUE = async (req: Request, res: Response) => {
+    const { email_comercial } = req.body;
+    
+    try {
+        const user = await UE.findByPk(email_comercial);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        const resetToken = jwt.sign({ email_comercial: user.email_comercial }, JWT_UE_ACCESS_KEY!, { expiresIn: '1h' });
+        const resetLink = `http://localhost:${FRONTEND_PORT}/reset-password/${resetToken}`;
+    
+        await sendPasswordResetEmail(email_comercial, resetLink);
+    
+        res.json({ message: 'Password reset email sent' });
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: 'Unknown error occurred' });
+        }
+    }
+};
+
+export const resetPasswordUE = async (req: Request, res: Response) => {
+    const { token, newPassword } = req.body;
+  
+    try {
+        const decoded = jwt.verify(token, JWT_UE_ACCESS_KEY!) as jwt.JwtPayload;
+        const email_comercial = decoded.email_comercial;
+        
+        const user = await UE.findByPk(email_comercial);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+  
+        const hashedPassword = await bcrypt.hash(newPassword, Number(SALT_ROUNDS));
+        await user.update({ senha: hashedPassword });
+  
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(500).json({ message: error.message });
+        } else {
+            res.status(500).json({ message: 'Unknown error occurred' });
+        }
     }
 };

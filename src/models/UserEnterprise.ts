@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes, Model } from "sequelize";
+import { Sequelize, DataTypes, Model, Optional } from 'sequelize';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -15,7 +15,35 @@ const sequelize = new Sequelize({
     }
 });
 
-export default class UE extends Model {}
+interface UEAttributes {
+    email_comercial: string;
+    senha: string;
+    razao_social: string;
+    cnpj: string;
+    cep?: string;
+    logradouro?: string;
+    bairro?: string;
+    municipio?: string;
+    suplemento?: string;
+    numero_contato?: string;
+    api_key?: string;
+}
+
+interface UECreationAttributes extends Optional<UEAttributes, 'email_comercial'> {}
+
+class UE extends Model<UEAttributes, UECreationAttributes> implements UEAttributes {
+    public email_comercial!: string;
+    public senha!: string;
+    public razao_social!: string;
+    public cnpj!: string;
+    public cep?: string;
+    public logradouro?: string;
+    public bairro?: string;
+    public municipio?: string;
+    public suplemento?: string;
+    public numero_contato?: string;
+    public api_key?: string;
+}
 
 UE.init(
     {
@@ -39,7 +67,7 @@ UE.init(
             unique: true
         },
         cep: {
-            type: DataTypes.STRING(10), // Ajuste o tamanho conforme necessário
+            type: DataTypes.STRING(10),
             allowNull: true,
         },
         logradouro: {
@@ -74,3 +102,5 @@ UE.init(
         timestamps: false
     }
 );
+
+export default UE;

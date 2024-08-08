@@ -9,22 +9,26 @@ import {
     generateApiKeyController,
     acessarInfoByApiKey,
     acessarInfoUsuarioByApiKey,
-    acessarInfoUsuarioJwt
+    acessarInfoUsuarioJwt,
+    requestPasswordResetUE,
+    resetPasswordUE
 } from '../controllers/userEnterpriseController.js';
 import { apiKeyAuthMiddleware } from '../middleware/apiKeyAuthMiddleware.js';
 import { jwtAuthMiddleware } from '../middleware/jwtAuthMiddleware.js';
 
 const router = Router();
 
-router.post('/cadastrar', (req, res, next) => { console.log('Rota /cadastrar chamada'); next(); }, cadastrarUsuario);
-router.post('/login', (req, res, next) => { console.log('Rota /login chamada'); next(); }, loginUsuario); // Certifique-se que esta rota está aqui
-router.get('/acessa-info', (req, res, next) => { console.log('Rota /acessa-info chamada'); next(); }, acessarInfoUsuario);
-router.get('/ver-todos', (req, res, next) => { console.log('Rota /ver-todos chamada'); next(); }, verTodosUsuarios);
-router.get('/consultar', (req, res, next) => { console.log('Rota /consultar chamada'); next(); }, consultarUsuario);
-router.get('/validarCNPJ', (req, res, next) => { console.log('Rota /validarCNPJ chamada'); next(); }, validarCNPJ);
-router.post('/generate-api-key', (req, res, next) => { console.log('Rota /generate-api-key chamada'); next(); }, generateApiKeyController);
-router.get('/acessa-info-by-api-key', (req, res, next) => { console.log('Rota /acessa-info-by-api-key chamada'); next(); }, apiKeyAuthMiddleware, acessarInfoByApiKey);
-router.get('/acessar-info-usuario-by-api-key', (req, res, next) => { console.log('Rota /acessar-info-usuario-by-api-key chamada'); next(); }, acessarInfoUsuarioByApiKey);
-router.get('/acessar-info-usuario-jwt', jwtAuthMiddleware, acessarInfoUsuarioJwt); // Adicionando a nova rota
+router.post('/cadastrar', cadastrarUsuario);
+router.post('/login', loginUsuario);
+router.get('/acessa-info', acessarInfoUsuario);
+router.get('/ver-todos', verTodosUsuarios);
+router.get('/consultar', consultarUsuario);
+router.get('/validarCNPJ', validarCNPJ);
+router.post('/generate-api-key', generateApiKeyController);
+router.get('/acessa-info-by-api-key', apiKeyAuthMiddleware, acessarInfoByApiKey);
+router.get('/acessar-info-usuario-by-api-key', acessarInfoUsuarioByApiKey);
+router.get('/acessar-info-usuario-jwt', jwtAuthMiddleware, acessarInfoUsuarioJwt);
+router.post('/request-password-reset', requestPasswordResetUE); // Nova rota para solicitar redefinição de senha
+router.post('/reset-password', resetPasswordUE); // Nova rota para redefinir a senha
 
 export default router;
